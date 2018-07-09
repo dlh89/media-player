@@ -1,0 +1,20 @@
+.player {
+  background-color: $color-secondary;
+  bottom: 0;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 80%;
+
+  &__progress-container {
+    background-color: $color-grey;
+    height: 1rem;
+    width: 100%;
+  }
+
+  &__progress-bar {
+    background-color: $color-primary;
+    height: inherit;
+    width: 0;
+  }
+}

@@ -1,0 +1,56 @@
+.row {
+  display: flex;
+  margin: 0 auto;
+
+  &:not(:last-child) {
+    margin-bottom: $gutter-vertical;
+
+    @include respond(mobile) {
+      margin-bottom: $gutter-vertical-small;
+    }
+  }
+
+  @include respond(mobile) {
+    display: block;
+  }
+
+  @include clearfix;
+}
+
+.col-1-of-3 {
+  float: left;
+  width: calc(
+    (100% - 2 * #{$gutter-width}) / 3
+  ); // 100% minus the gutters divided by 3
+
+  &:not(:last-child) {
+    margin-right: $gutter-width; // apply a gutter to all but the last column
+
+    @include respond(mobile) {
+      margin-bottom: $gutter-vertical-small;
+    }
+  }
+
+  @include respond(mobile) {
+    width: 100%;
+  }
+}
+
+.col-1-of-2 {
+  float: left;
+  width: calc(
+    (100% - #{$gutter-width}) / 2
+  ); // 100% minus the gutter divided by 2
+
+  &:not(:last-child) {
+    margin-right: $gutter-width; // apply a gutter to all but the last column
+
+    @include respond(mobile) {
+      margin-bottom: $gutter-vertical-small;
+    }
+  }
+
+  @include respond(mobile) {
+    width: 100%;
+  }
+}
