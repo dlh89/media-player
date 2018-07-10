@@ -5,7 +5,9 @@ export default class Player extends React.Component {
     super(props);
     this.state = {
       volume: 100,
-      playbackRate: 1
+      playbackRate: 1,
+      currentTime: "",
+      duration: ""
     };
 
     this.handlePlayPause = this.handlePlayPause.bind(this);
@@ -15,12 +17,41 @@ export default class Player extends React.Component {
     this.handleVolumeChange = this.handleVolumeChange.bind(this);
     this.handlePlaybackRateChange = this.handlePlaybackRateChange.bind(this);
     this.handleProgressChange = this.handleProgressChange.bind(this);
+    this.handleProgress = this.handleProgress.bind(this);
   }
   componentDidMount() {
+    let mousedown = false;
+    this.refs.progressContainer.addEventListener(
+      "mousedown",
+      () => (mousedown = true)
+    );
+    this.refs.progressContainer.addEventListener(
+      "mouseup",
+      () => (mousedown = false)
+    );
+    this.refs.progressContainer.addEventListener(
+      "mouseleave",
+      () => (mousedown = false)
+    );
+    this.refs.progressContainer.addEventListener("mousemove", e => {
+      mousedown && this.handleProgressChange(e);
+    });
     this.refs.progressContainer.addEventListener(
       "click",
       this.handleProgressChange
     );
+    this.refs.player.addEventListener("timeupdate", this.handleProgress);
+  }
+  componentWillReceiveProps() {
+    this.setState({ duration: this.refs.player.duration });
+  }
+  handleProgress() {
+    this.setState({
+      currentTime: Math.round(this.refs.player.currentTime)
+    });
+    const progress = this.refs.player.currentTime / this.refs.player.duration;
+    this.refs.progressBar.style.width = `${this.refs.progressContainer
+      .offsetWidth * progress}px`;
   }
   handleProgressChange(e) {
     const progress = e.offsetX / e.target.clientWidth;
@@ -29,8 +60,6 @@ export default class Player extends React.Component {
     this.refs.progressBar.style.width = `${e.offsetX}px`;
   }
   handlePlayPause() {
-    console.log(this.refs);
-
     if (this.refs.player.error) {
       console.log(this.refs.player.error.message);
     }
@@ -102,6 +131,11 @@ export default class Player extends React.Component {
               <button value="2" onClick={this.handlePlaybackRateChange}>
                 2x
               </button>
+            </div>
+            <div className="player__time">
+              <p>
+                {this.state.currentTime} / {this.state.duration}
+              </p>
             </div>
           </div>
         </div>
