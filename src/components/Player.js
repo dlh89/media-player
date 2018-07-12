@@ -8,7 +8,9 @@ export default class Player extends React.Component {
       volume: 100,
       playbackRate: 1,
       currentTime: "",
-      duration: ""
+      duration: "",
+      playing: false,
+      muted: false
     };
 
     this.handlePlayPause = this.handlePlayPause.bind(this);
@@ -63,7 +65,7 @@ export default class Player extends React.Component {
       .offsetWidth * progress}px`;
   }
   handleProgressChange(e) {
-    const progress = e.offsetX / e.target.clientWidth;
+    const progress = e.offsetX / this.refs.progressContainer.offsetWidth;
     console.log(`Progress: ${progress * 100}%`);
     this.refs.player.currentTime = this.refs.player.duration * progress;
     this.refs.progressBar.style.width = `${e.offsetX}px`;
@@ -74,8 +76,10 @@ export default class Player extends React.Component {
     }
     if (this.refs.player.paused) {
       this.refs.player.play();
+      this.setState({ playing: true });
     } else {
       this.refs.player.pause();
+      this.setState({ playing: false });
     }
   }
   handleSkipBackward() {
@@ -88,9 +92,11 @@ export default class Player extends React.Component {
     if (this.refs.player.muted) {
       this.refs.player.volume = this.state.volume / 100;
       this.refs.player.muted = false;
+      this.setState({ muted: false });
     } else {
       this.refs.player.volume = 0;
       this.refs.player.muted = true;
+      this.setState({ muted: true });
     }
   }
   handleVolumeChange(e) {
@@ -114,8 +120,15 @@ export default class Player extends React.Component {
         <audio ref="player" autoPlay src={this.props.link} />
         <div className="player__general-controls">
           <button onClick={this.handleSkipBackward}>-10</button>
-          <button onClick={this.handlePlayPause}>Play/Pause</button>
+          <button onClick={this.handlePlayPause}>
+            {this.state.playing ? "Pause" : "Play"}
+          </button>
           <button onClick={this.handleSkipForward}>+10</button>
+          <div className="player__time">
+            <p>
+              {this.state.currentTime} / {this.state.duration}
+            </p>
+          </div>
           <div className="player__playback-rate">
             <button>{this.state.playbackRate}x</button>
             <div className="player__playback-rate-dropdown">
@@ -141,15 +154,12 @@ export default class Player extends React.Component {
                 2x
               </button>
             </div>
-            <div className="player__time">
-              <p>
-                {this.state.currentTime} / {this.state.duration}
-              </p>
-            </div>
           </div>
         </div>
         <div className="player__volume-controls">
-          <button onClick={this.handleMuteUnmute}>Mute/Unmute</button>
+          <button onClick={this.handleMuteUnmute}>
+            {this.state.muted ? "Unmute" : "Mute"}
+          </button>
           <input
             type="range"
             min="0"
