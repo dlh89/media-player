@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -43,11 +44,19 @@ export default class Player extends React.Component {
     this.refs.player.addEventListener("timeupdate", this.handleProgress);
   }
   componentWillReceiveProps() {
-    this.setState({ duration: this.refs.player.duration });
+    this.setState({
+      duration: moment()
+        .startOf("day")
+        .seconds(this.refs.player.duration)
+        .format("H:mm:ss")
+    });
   }
   handleProgress() {
     this.setState({
-      currentTime: Math.round(this.refs.player.currentTime)
+      currentTime: moment()
+        .startOf("day")
+        .seconds(this.refs.player.currentTime)
+        .format("H:mm:ss")
     });
     const progress = this.refs.player.currentTime / this.refs.player.duration;
     this.refs.progressBar.style.width = `${this.refs.progressContainer
