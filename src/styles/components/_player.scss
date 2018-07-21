@@ -17,4 +17,23 @@
     height: inherit;
     width: 0;
   }
+
+  &__controls-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  &__playback-rate-controls {
+    max-height: 0;
+    transition: max-height 0.2s ease;
+  }
+
+  &__playback-rate-btn {
+    background-color: $color-primary;
+    border: none;
+    color: #fff;
+    height: 4rem;
+    min-width: 5.5rem;
+  }
 }

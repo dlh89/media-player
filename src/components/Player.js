@@ -21,6 +21,9 @@ export default class Player extends React.Component {
     this.handlePlaybackRateChange = this.handlePlaybackRateChange.bind(this);
     this.handleProgressChange = this.handleProgressChange.bind(this);
     this.handleProgress = this.handleProgress.bind(this);
+    this.togglePlaybackRateControls = this.togglePlaybackRateControls.bind(
+      this
+    );
   }
   componentDidMount() {
     let mousedown = false;
@@ -110,6 +113,19 @@ export default class Player extends React.Component {
       playbackRate: e.target.value
     });
     this.refs.player.playbackRate = e.target.value;
+    this.togglePlaybackRateControls();
+  }
+  togglePlaybackRateControls() {
+    if (
+      this.refs.playbackRateControls.style.maxHeight &&
+      this.refs.playbackRateControls.style.maxHeight !== "0px"
+    ) {
+      this.refs.playbackRateControls.style.maxHeight = 0;
+    } else {
+      this.refs.playbackRateControls.style.maxHeight = `${
+        this.refs.playbackRateControls.scrollHeight
+      }px`;
+    }
   }
   render() {
     return (
@@ -118,60 +134,98 @@ export default class Player extends React.Component {
           <div ref="progressBar" className="player__progress-bar" />
         </div>
         <audio ref="player" autoPlay src={this.props.link} />
-        <div className="player__general-controls">
-          <button onClick={this.handleSkipBackward}>-10</button>
-          <button onClick={this.handlePlayPause}>
-            {this.state.playing ? "Pause" : "Play"}
-          </button>
-          <button onClick={this.handleSkipForward}>+10</button>
+        <div className="player__controls-container">
+          <div>
+            <button onClick={this.handleSkipBackward}>-10</button>
+            <button onClick={this.handlePlayPause}>
+              {this.state.playing ? "Pause" : "Play"}
+            </button>
+            <button onClick={this.handleSkipForward}>+10</button>
+          </div>
           <div className="player__time">
             <p>
               {this.state.currentTime} / {this.state.duration}
             </p>
           </div>
           <div className="player__playback-rate">
-            <button>{this.state.playbackRate}x</button>
-            <div className="player__playback-rate-dropdown">
-              <button value="0.25" onClick={this.handlePlaybackRateChange}>
+            <button
+              className="player__playback-rate-btn"
+              onClick={this.togglePlaybackRateControls}
+            >
+              {this.state.playbackRate}x
+            </button>
+            <div
+              ref="playbackRateControls"
+              className="player__playback-rate-controls"
+            >
+              <button
+                className="player__playback-rate-btn"
+                value="0.25"
+                onClick={this.handlePlaybackRateChange}
+              >
                 0.25x
               </button>
-              <button value="0.5" onClick={this.handlePlaybackRateChange}>
+              <button
+                className="player__playback-rate-btn"
+                value="0.5"
+                onClick={this.handlePlaybackRateChange}
+              >
                 0.5x
               </button>
-              <button value="0.75" onClick={this.handlePlaybackRateChange}>
+              <button
+                className="player__playback-rate-btn"
+                value="0.75"
+                onClick={this.handlePlaybackRateChange}
+              >
                 0.75x
               </button>
-              <button value="1" onClick={this.handlePlaybackRateChange}>
+              <button
+                className="player__playback-rate-btn"
+                value="1"
+                onClick={this.handlePlaybackRateChange}
+              >
                 1x
               </button>
-              <button value="1.25" onClick={this.handlePlaybackRateChange}>
+              <button
+                className="player__playback-rate-btn"
+                value="1.25"
+                onClick={this.handlePlaybackRateChange}
+              >
                 1.25x
               </button>
-              <button value="1.5" onClick={this.handlePlaybackRateChange}>
+              <button
+                className="player__playback-rate-btn"
+                value="1.5"
+                onClick={this.handlePlaybackRateChange}
+              >
                 1.5x
               </button>
-              <button value="2" onClick={this.handlePlaybackRateChange}>
+              <button
+                className="player__playback-rate-btn"
+                value="2"
+                onClick={this.handlePlaybackRateChange}
+              >
                 2x
               </button>
             </div>
           </div>
+          <div className="player__volume-controls">
+            <button onClick={this.handleMuteUnmute}>
+              {this.state.muted ? "Unmute" : "Mute"}
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={this.state.volume}
+              onChange={this.handleVolumeChange}
+              className="volume-slider"
+            />
+          </div>
+          <a href={this.props.link} download target="_blank">
+            Download
+          </a>
         </div>
-        <div className="player__volume-controls">
-          <button onClick={this.handleMuteUnmute}>
-            {this.state.muted ? "Unmute" : "Mute"}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={this.state.volume}
-            onChange={this.handleVolumeChange}
-            className="volume-slider"
-          />
-        </div>
-        <a href={this.props.link} download target="_blank">
-          Download
-        </a>
       </div>
     );
   }
