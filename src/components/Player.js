@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import IcoMoon from "react-icomoon";
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -136,13 +137,21 @@ export default class Player extends React.Component {
         <audio ref="player" autoPlay src={this.props.link} />
         <div className="player__controls-container">
           <div>
-            <button onClick={this.handleSkipBackward}>-10</button>
-            <button onClick={this.handlePlayPause}>
-              {this.state.playing ? "Pause" : "Play"}
+            <button className="btn" onClick={this.handleSkipBackward}>
+              -10
             </button>
-            <button onClick={this.handleSkipForward}>+10</button>
+            <button className="btn" onClick={this.handlePlayPause}>
+              {this.state.playing ? (
+                <IcoMoon icon="pause2" />
+              ) : (
+                <IcoMoon icon="play3" />
+              )}
+            </button>
+            <button className="btn" onClick={this.handleSkipForward}>
+              +10
+            </button>
           </div>
-          <div className="player__time">
+          <div className="btn" className="player__time">
             <p>
               {this.state.currentTime} / {this.state.duration}
             </p>
@@ -210,8 +219,12 @@ export default class Player extends React.Component {
             </div>
           </div>
           <div className="player__volume-controls">
-            <button onClick={this.handleMuteUnmute}>
-              {this.state.muted ? "Unmute" : "Mute"}
+            <button className="btn" onClick={this.handleMuteUnmute}>
+              {this.state.muted ? (
+                <IcoMoon icon="volume-mute2" />
+              ) : (
+                <IcoMoon icon="volume-medium" />
+              )}
             </button>
             <input
               type="range"
@@ -219,7 +232,7 @@ export default class Player extends React.Component {
               max="100"
               value={this.state.volume}
               onChange={this.handleVolumeChange}
-              className="volume-slider"
+              className="player__volume-slider"
             />
           </div>
           <a href={this.props.link} download target="_blank">

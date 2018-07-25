@@ -36,4 +36,8 @@
     height: 4rem;
     min-width: 5.5rem;
   }
+
+  &__volume-slider {
+    transform: translateY(20%);
+  }
 }
