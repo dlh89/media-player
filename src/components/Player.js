@@ -1,6 +1,7 @@
 import React from "react";
 import moment from "moment";
 import IcoMoon from "react-icomoon";
+import ArrayFrom from "array.from";
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -114,6 +115,16 @@ export default class Player extends React.Component {
       playbackRate: e.target.value
     });
     this.refs.player.playbackRate = e.target.value;
+
+    // remove the active class from any other buttons and add to the one clicked
+    const activeButtons = ArrayFrom(
+      document.querySelectorAll(".player__playback-rate-btn--active")
+    );
+    activeButtons.forEach(button => {
+      button.classList.remove("player__playback-rate-btn--active");
+    });
+    e.target.classList.add("player__playback-rate-btn--active");
+
     this.togglePlaybackRateControls();
   }
   togglePlaybackRateControls() {
@@ -123,9 +134,14 @@ export default class Player extends React.Component {
     ) {
       this.refs.playbackRateControls.style.maxHeight = 0;
     } else {
-      this.refs.playbackRateControls.style.maxHeight = `${
-        this.refs.playbackRateControls.scrollHeight
-      }px`;
+      const buttonCount = document.querySelectorAll(
+        ".player__playback-rate-btn"
+      ).length;
+      this.refs.playbackRateControls.style.maxHeight = `${document.querySelector(
+        ".player__playback-rate-btn"
+      ).scrollHeight *
+        buttonCount -
+        1}px`;
     }
   }
   render() {
@@ -158,7 +174,7 @@ export default class Player extends React.Component {
           </div>
           <div className="player__playback-rate">
             <button
-              className="player__playback-rate-btn"
+              className="player__playback-rate-btn player__playback-rate-btn--primary"
               onClick={this.togglePlaybackRateControls}
             >
               {this.state.playbackRate}x
@@ -189,7 +205,7 @@ export default class Player extends React.Component {
                 0.75x
               </button>
               <button
-                className="player__playback-rate-btn"
+                className="player__playback-rate-btn player__playback-rate-btn--active"
                 value="1"
                 onClick={this.handlePlaybackRateChange}
               >

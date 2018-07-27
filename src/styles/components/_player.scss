@@ -25,8 +25,14 @@
   }
 
   &__playback-rate-controls {
+    bottom: 100%;
+    display: flex;
+    position: absolute;
+    flex-direction: column-reverse;
     max-height: 0;
+    overflow: hidden;
     transition: max-height 0.2s ease;
+    z-index: -1;
   }
 
   &__playback-rate-btn {
@@ -35,6 +41,15 @@
     color: #fff;
     height: 4rem;
     min-width: 5.5rem;
+
+    &--active {
+      background-color: lighten($color-primary, 10%);
+    }
+
+    &--primary {
+      // this class exists to prevent the primary button's colour being changed by the JavaScript
+      @extend .player__playback-rate-btn--active;
+    }
   }
 
   &__volume-slider {
