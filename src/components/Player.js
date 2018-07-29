@@ -23,6 +23,7 @@ export default class Player extends React.Component {
     this.handlePlaybackRateChange = this.handlePlaybackRateChange.bind(this);
     this.handleProgressChange = this.handleProgressChange.bind(this);
     this.handleProgress = this.handleProgress.bind(this);
+    this.canPlay = this.canPlay.bind(this);
     this.togglePlaybackRateControls = this.togglePlaybackRateControls.bind(
       this
     );
@@ -51,12 +52,21 @@ export default class Player extends React.Component {
     this.refs.player.addEventListener("timeupdate", this.handleProgress);
   }
   componentWillReceiveProps() {
-    this.setState({
-      duration: moment()
-        .startOf("day")
-        .seconds(this.refs.player.duration)
-        .format("H:mm:ss")
-    });
+    this.refs.player.addEventListener("canplay", this.canPlay);
+    this.refs.player.addEventListener("error", this.linkError);
+  }
+  linkError() {
+    alert("There was an error loading the URL you provided.");
+  }
+  canPlay() {
+    if (this.refs.player.duration) {
+      this.setState({
+        duration: moment()
+          .startOf("day")
+          .seconds(this.refs.player.duration)
+          .format("H:mm:ss")
+      });
+    }
   }
   handleProgress() {
     this.setState({
@@ -68,10 +78,12 @@ export default class Player extends React.Component {
     const progress = this.refs.player.currentTime / this.refs.player.duration;
     this.refs.progressBar.style.width = `${this.refs.progressContainer
       .offsetWidth * progress}px`;
+    if (!this.refs.player.paused && !this.state.playing) {
+      this.setState({ playing: true });
+    }
   }
   handleProgressChange(e) {
     const progress = e.offsetX / this.refs.progressContainer.offsetWidth;
-    console.log(`Progress: ${progress * 100}%`);
     this.refs.player.currentTime = this.refs.player.duration * progress;
     this.refs.progressBar.style.width = `${e.offsetX}px`;
   }
