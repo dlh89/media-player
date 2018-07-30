@@ -1,20 +1,46 @@
 @mixin clearfix {
-    &::after {
-        content: "";
-        display: table;
-        clear: both;
-    }
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
 }
 
 // Media queries
 @mixin respond($breakpoint) {
-    @if $breakpoint == mobile {
-      @media (max-width: 37.5em) { @content; }  // 600px
-    }
-    @if $breakpoint == tab-port {
-      @media (max-width: 56.25em) { @content; } // 900px
-    }
-    @if $breakpoint == tab-land {
-      @media (max-width: 75em) { @content; } // 1200px
-    }
-} 
+  @if $breakpoint == mobile {
+    @media (max-width: 37.5em) {
+      @content;
+    } // 600px
+  }
+  @if $breakpoint == tab-port {
+    @media (max-width: 56.25em) {
+      @content;
+    } // 900px
+  }
+  @if $breakpoint == tab-land {
+    @media (max-width: 75em) {
+      @content;
+    } // 1200px
+  }
+}
+
+// Input slider styles
+// Slider is made up of track and thumb elements
+@mixin track() {
+  background-color: $color-grey;
+  cursor: pointer;
+  height: 0.4rem;
+  margin-bottom: 0.7rem;
+  width: 100%;
+}
+
+@mixin thumb() {
+  -webkit-appearance: none;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 1.5rem;
+  width: 1.5rem;
+}

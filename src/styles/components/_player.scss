@@ -53,6 +53,35 @@
   }
 
   &__volume-slider {
+    background-color: transparent;
     transform: translateY(20%);
+    -webkit-appearance: none;
+
+    /* Apply styles to all the different pseudoclasses for Chrome, Firefox and Edge */
+
+    // tracks
+    &::-webkit-slider-runnable-track {
+      @include track;
+    }
+    &::-moz-range-track {
+      @include track;
+    }
+    &::-ms-track {
+      @include track;
+    }
+
+    // thumbs
+    &::-webkit-slider-thumb {
+      margin-top: -0.5rem;
+      @include thumb;
+    }
+
+    &::-moz-range-thumb {
+      @include thumb;
+    }
+
+    &::-ms-thumb {
+      @include thumb;
+    }
   }
 }
