@@ -1,6 +1,7 @@
 .player {
-  background-color: $color-secondary;
+  background-color: $color-primary;
   bottom: 0;
+  color: #fff;
   left: 50%;
   position: fixed;
   transform: translateX(-50%);
@@ -10,10 +11,14 @@
     background-color: $color-grey;
     height: 1rem;
     width: 100%;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   &__progress-bar {
-    background-color: $color-primary;
+    background-color: $color-secondary;
     height: inherit;
     width: 0;
   }
@@ -31,19 +36,19 @@
     flex-direction: column-reverse;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.2s ease;
+    transition: max-height 0.2s ease-out;
     z-index: -1;
   }
 
   &__playback-rate-btn {
-    background-color: $color-primary;
+    background-color: $color-secondary;
     border: none;
     color: #fff;
     height: 4rem;
     min-width: 5.5rem;
 
     &--active {
-      background-color: lighten($color-primary, 10%);
+      background-color: lighten($color-secondary, 10%);
     }
 
     &--primary {

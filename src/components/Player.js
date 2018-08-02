@@ -1,6 +1,5 @@
 import React from "react";
 import moment from "moment";
-import IcoMoon from "react-icomoon";
 import ArrayFrom from "array.from";
 
 export default class Player extends React.Component {
@@ -170,9 +169,9 @@ export default class Player extends React.Component {
             </button>
             <button className="btn" onClick={this.handlePlayPause}>
               {this.state.playing ? (
-                <IcoMoon icon="pause2" />
+                <i className="fas fa-pause" />
               ) : (
-                <IcoMoon icon="play3" />
+                <i className="fas fa-play" />
               )}
             </button>
             <button className="btn" onClick={this.handleSkipForward}>
@@ -249,9 +248,9 @@ export default class Player extends React.Component {
           <div className="player__volume-controls">
             <button className="btn" onClick={this.handleMuteUnmute}>
               {this.state.muted ? (
-                <IcoMoon icon="volume-mute2" />
+                <i className="fas fa-volume-off" />
               ) : (
-                <IcoMoon icon="volume-medium" />
+                <i className="fas fa-volume-up" />
               )}
             </button>
             <input
@@ -264,7 +263,7 @@ export default class Player extends React.Component {
             />
           </div>
           <a href={this.props.link} download target="_blank">
-            Download
+            <i className="fas fa-download" />
           </a>
         </div>
       </div>
