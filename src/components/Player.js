@@ -7,6 +7,7 @@ export default class Player extends React.Component {
     super(props);
     this.state = {
       volume: 100,
+      prevVolume: "",
       playbackRate: 1,
       currentTime: "",
       duration: "",
@@ -106,19 +107,35 @@ export default class Player extends React.Component {
   }
   handleMuteUnmute() {
     if (this.refs.player.muted) {
-      this.refs.player.volume = this.state.volume / 100;
       this.refs.player.muted = false;
-      this.setState({ muted: false });
+      this.setState(
+        { muted: false, volume: this.state.prevVolume },
+        () => (this.refs.player.volume = this.state.volume / 100)
+      );
     } else {
       this.refs.player.volume = 0;
       this.refs.player.muted = true;
-      this.setState({ muted: true });
+      this.setState(prevState => {
+        return { muted: true, volume: 0, prevVolume: prevState.volume };
+      });
     }
   }
   handleVolumeChange(e) {
-    this.setState({
-      volume: e.target.value
-    });
+    this.setState(
+      {
+        volume: e.target.value
+      },
+      () => {
+        if (this.state.volume === "0") {
+          this.setState({ muted: true });
+          this.refs.player.muted = true;
+        } else {
+          this.setState({ muted: false });
+          this.refs.player.muted = false;
+        }
+      }
+    );
+
     this.refs.player.volume = e.target.value / 100;
   }
   handlePlaybackRateChange(e) {
@@ -254,6 +271,7 @@ export default class Player extends React.Component {
               )}
             </button>
             <input
+              ref="volumeSlider"
               type="range"
               min="0"
               max="100"
