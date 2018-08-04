@@ -5,6 +5,13 @@ import ArrayFrom from "array.from";
 export default class Player extends React.Component {
   constructor(props) {
     super(props);
+
+    // refs
+    this.player = React.createRef();
+    this.progressContainer = React.createRef();
+    this.progressBar = React.createRef();
+    this.playbackRateControls = React.createRef();
+
     this.state = {
       volume: 100,
       prevVolume: "",
@@ -30,40 +37,40 @@ export default class Player extends React.Component {
   }
   componentDidMount() {
     let mousedown = false;
-    this.refs.progressContainer.addEventListener(
+    this.progressContainer.current.addEventListener(
       "mousedown",
       () => (mousedown = true)
     );
-    this.refs.progressContainer.addEventListener(
+    this.progressContainer.current.addEventListener(
       "mouseup",
       () => (mousedown = false)
     );
-    this.refs.progressContainer.addEventListener(
+    this.progressContainer.current.addEventListener(
       "mouseleave",
       () => (mousedown = false)
     );
-    this.refs.progressContainer.addEventListener("mousemove", e => {
+    this.progressContainer.current.addEventListener("mousemove", e => {
       mousedown && this.handleProgressChange(e);
     });
-    this.refs.progressContainer.addEventListener(
+    this.progressContainer.current.addEventListener(
       "click",
       this.handleProgressChange
     );
-    this.refs.player.addEventListener("timeupdate", this.handleProgress);
+    this.player.current.addEventListener("timeupdate", this.handleProgress);
   }
   componentWillReceiveProps() {
-    this.refs.player.addEventListener("canplay", this.canPlay);
-    this.refs.player.addEventListener("error", this.linkError);
+    this.player.current.addEventListener("canplay", this.canPlay);
+    this.player.current.addEventListener("error", this.linkError);
   }
   linkError() {
     alert("There was an error loading the URL you provided.");
   }
   canPlay() {
-    if (this.refs.player.duration) {
+    if (this.player.current.duration) {
       this.setState({
         duration: moment()
           .startOf("day")
-          .seconds(this.refs.player.duration)
+          .seconds(this.player.current.duration)
           .format("H:mm:ss")
       });
     }
@@ -72,49 +79,50 @@ export default class Player extends React.Component {
     this.setState({
       currentTime: moment()
         .startOf("day")
-        .seconds(this.refs.player.currentTime)
+        .seconds(this.player.current.currentTime)
         .format("H:mm:ss")
     });
-    const progress = this.refs.player.currentTime / this.refs.player.duration;
-    this.refs.progressBar.style.width = `${this.refs.progressContainer
+    const progress =
+      this.player.current.currentTime / this.player.current.duration;
+    this.progressBar.current.style.width = `${this.progressContainer.current
       .offsetWidth * progress}px`;
-    if (!this.refs.player.paused && !this.state.playing) {
+    if (!this.player.current.paused && !this.state.playing) {
       this.setState({ playing: true });
     }
   }
   handleProgressChange(e) {
-    const progress = e.offsetX / this.refs.progressContainer.offsetWidth;
-    this.refs.player.currentTime = this.refs.player.duration * progress;
-    this.refs.progressBar.style.width = `${e.offsetX}px`;
+    const progress = e.offsetX / this.progressContainer.current.offsetWidth;
+    this.player.current.currentTime = this.player.current.duration * progress;
+    this.progressBar.current.style.width = `${e.offsetX}px`;
   }
   handlePlayPause() {
-    if (this.refs.player.error) {
-      console.log(this.refs.player.error.message);
+    if (this.player.current.error) {
+      console.log(this.player.current.error.message);
     }
-    if (this.refs.player.paused) {
-      this.refs.player.play();
+    if (this.player.current.paused) {
+      this.player.current.play();
       this.setState({ playing: true });
     } else {
-      this.refs.player.pause();
+      this.player.current.pause();
       this.setState({ playing: false });
     }
   }
   handleSkipBackward() {
-    this.refs.player.currentTime -= 10;
+    this.player.current.currentTime -= 10;
   }
   handleSkipForward() {
-    this.refs.player.currentTime += 10;
+    this.player.current.currentTime += 10;
   }
   handleMuteUnmute() {
-    if (this.refs.player.muted) {
-      this.refs.player.muted = false;
+    if (this.player.current.muted) {
+      this.player.current.muted = false;
       this.setState(
         { muted: false, volume: this.state.prevVolume },
-        () => (this.refs.player.volume = this.state.volume / 100)
+        () => (this.player.current.volume = this.state.volume / 100)
       );
     } else {
-      this.refs.player.volume = 0;
-      this.refs.player.muted = true;
+      this.player.current.volume = 0;
+      this.player.current.muted = true;
       this.setState(prevState => {
         return { muted: true, volume: 0, prevVolume: prevState.volume };
       });
@@ -128,21 +136,21 @@ export default class Player extends React.Component {
       () => {
         if (this.state.volume === "0") {
           this.setState({ muted: true });
-          this.refs.player.muted = true;
+          this.player.current.muted = true;
         } else {
           this.setState({ muted: false });
-          this.refs.player.muted = false;
+          this.player.current.muted = false;
         }
       }
     );
 
-    this.refs.player.volume = e.target.value / 100;
+    this.player.current.volume = e.target.value / 100;
   }
   handlePlaybackRateChange(e) {
     this.setState({
       playbackRate: e.target.value
     });
-    this.refs.player.playbackRate = e.target.value;
+    this.player.current.playbackRate = e.target.value;
 
     // remove the active class from any other buttons and add to the one clicked
     const activeButtons = ArrayFrom(
@@ -157,15 +165,15 @@ export default class Player extends React.Component {
   }
   togglePlaybackRateControls() {
     if (
-      this.refs.playbackRateControls.style.maxHeight &&
-      this.refs.playbackRateControls.style.maxHeight !== "0px"
+      this.playbackRateControls.current.style.maxHeight &&
+      this.playbackRateControls.current.style.maxHeight !== "0px"
     ) {
-      this.refs.playbackRateControls.style.maxHeight = 0;
+      this.playbackRateControls.current.style.maxHeight = 0;
     } else {
       const buttonCount = document.querySelectorAll(
         ".player__playback-rate-btn"
       ).length;
-      this.refs.playbackRateControls.style.maxHeight = `${document.querySelector(
+      this.playbackRateControls.current.style.maxHeight = `${document.querySelector(
         ".player__playback-rate-btn"
       ).scrollHeight *
         buttonCount -
@@ -175,10 +183,13 @@ export default class Player extends React.Component {
   render() {
     return (
       <div className="player">
-        <div ref="progressContainer" className="player__progress-container">
-          <div ref="progressBar" className="player__progress-bar" />
+        <div
+          ref={this.progressContainer}
+          className="player__progress-container"
+        >
+          <div ref={this.progressBar} className="player__progress-bar" />
         </div>
-        <audio ref="player" autoPlay src={this.props.link} />
+        <audio ref={this.player} autoPlay src={this.props.link} />
         <div className="player__controls-container">
           <div>
             <button className="btn" onClick={this.handleSkipBackward}>
@@ -208,7 +219,7 @@ export default class Player extends React.Component {
               {this.state.playbackRate}x
             </button>
             <div
-              ref="playbackRateControls"
+              ref={this.playbackRateControls}
               className="player__playback-rate-controls"
             >
               <button
@@ -271,7 +282,6 @@ export default class Player extends React.Component {
               )}
             </button>
             <input
-              ref="volumeSlider"
               type="range"
               min="0"
               max="100"
