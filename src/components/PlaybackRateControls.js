@@ -12,6 +12,7 @@ export default class PlaybackRateControls extends React.Component {
     );
     this.handlePlaybackRateChange = this.handlePlaybackRateChange.bind(this);
   }
+
   togglePlaybackRateControls() {
     if (
       this.playbackRateControls.current.style.maxHeight &&
@@ -29,6 +30,7 @@ export default class PlaybackRateControls extends React.Component {
         1}px`;
     }
   }
+
   handlePlaybackRateChange(e) {
     this.props.onPlaybackRateChange(e.target.value);
     this.togglePlaybackRateControls();
@@ -42,6 +44,7 @@ export default class PlaybackRateControls extends React.Component {
     });
     e.target.classList.add("player__playback-rate-btn--active");
   }
+
   render() {
     return (
       <div className="player__playback-rate">

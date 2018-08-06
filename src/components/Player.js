@@ -5,6 +5,7 @@ import MainControls from "./MainControls";
 import TimeDisplay from "./TimeDisplay";
 import PlaybackRateControls from "./PlaybackRateControls";
 import VolumeControls from "./VolumeControls";
+import ProgressBar from "./ProgressBar";
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -12,8 +13,6 @@ export default class Player extends React.Component {
 
     // refs
     this.player = React.createRef();
-    this.progressContainer = React.createRef();
-    this.progressBar = React.createRef();
 
     this.state = {
       volume: 100,
@@ -22,7 +21,8 @@ export default class Player extends React.Component {
       currentTime: "",
       duration: "",
       playing: false,
-      muted: false
+      muted: false,
+      canPlay: false
     };
 
     this.handlePlayingChange = this.handlePlayingChange.bind(this);
@@ -35,46 +35,32 @@ export default class Player extends React.Component {
     this.handleProgress = this.handleProgress.bind(this);
     this.canPlay = this.canPlay.bind(this);
   }
+
   componentDidMount() {
-    let mousedown = false;
-    this.progressContainer.current.addEventListener(
-      "mousedown",
-      () => (mousedown = true)
-    );
-    this.progressContainer.current.addEventListener(
-      "mouseup",
-      () => (mousedown = false)
-    );
-    this.progressContainer.current.addEventListener(
-      "mouseleave",
-      () => (mousedown = false)
-    );
-    this.progressContainer.current.addEventListener("mousemove", e => {
-      mousedown && this.handleProgressChange(e);
-    });
-    this.progressContainer.current.addEventListener(
-      "click",
-      this.handleProgressChange
-    );
     this.player.current.addEventListener("timeupdate", this.handleProgress);
   }
+
   componentWillReceiveProps() {
     this.player.current.addEventListener("canplay", this.canPlay);
     this.player.current.addEventListener("error", this.linkError);
   }
+
   linkError() {
     alert("There was an error loading the URL you provided.");
   }
+
   canPlay() {
     if (this.player.current.duration) {
       this.setState({
         duration: moment()
           .startOf("day")
           .seconds(this.player.current.duration)
-          .format("H:mm:ss")
+          .format("H:mm:ss"),
+        canPlay: true
       });
     }
   }
+
   handleProgress() {
     this.setState({
       currentTime: moment()
@@ -82,18 +68,13 @@ export default class Player extends React.Component {
         .seconds(this.player.current.currentTime)
         .format("H:mm:ss")
     });
-    const progress =
-      this.player.current.currentTime / this.player.current.duration;
-    this.progressBar.current.style.width = `${this.progressContainer.current
-      .offsetWidth * progress}px`;
     if (!this.player.current.paused && !this.state.playing) {
       this.setState({ playing: true });
     }
   }
-  handleProgressChange(e) {
-    const progress = e.offsetX / this.progressContainer.current.offsetWidth;
+
+  handleProgressChange(progress) {
     this.player.current.currentTime = this.player.current.duration * progress;
-    this.progressBar.current.style.width = `${e.offsetX}px`;
   }
 
   handleVolumeChange(volume) {
@@ -147,15 +128,17 @@ export default class Player extends React.Component {
   handleCurrentTimeChange(time) {
     this.player.current.currentTime += time;
   }
+
   render() {
     return (
       <div className="player">
-        <div
-          ref={this.progressContainer}
-          className="player__progress-container"
-        >
-          <div ref={this.progressBar} className="player__progress-bar" />
-        </div>
+        <ProgressBar
+          currentTime={this.state.currentTime}
+          duration={this.state.duration}
+          onProgressChange={this.handleProgressChange}
+          canPlay={this.state.canPlay}
+        />
+
         <audio ref={this.player} autoPlay src={this.props.link} />
 
         <div className="player__controls-container">

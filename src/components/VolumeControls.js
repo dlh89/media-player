@@ -7,12 +7,15 @@ export default class VolumeControls extends React.Component {
     this.handleVolumeChange = this.handleVolumeChange.bind(this);
     this.handleMutedChange = this.handleMutedChange.bind(this);
   }
+
   handleVolumeChange(e) {
     this.props.onVolumeChange(e.target.value);
   }
+
   handleMutedChange() {
     this.props.onMutedChange(!this.props.muted);
   }
+
   render() {
     return (
       <div className="player__volume-controls">
