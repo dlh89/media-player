@@ -2,6 +2,7 @@ import React from "react";
 import moment from "moment";
 import ArrayFrom from "array.from";
 
+import MainControls from "./MainControls";
 import TimeDisplay from "./TimeDisplay";
 
 export default class Player extends React.Component {
@@ -24,7 +25,9 @@ export default class Player extends React.Component {
       muted: false
     };
 
-    this.handlePlayPause = this.handlePlayPause.bind(this);
+    this.handlePlayingChange = this.handlePlayingChange.bind(this);
+    this.handleCurrentTimeChange = this.handleCurrentTimeChange.bind(this);
+
     this.handleSkipBackward = this.handleSkipBackward.bind(this);
     this.handleSkipForward = this.handleSkipForward.bind(this);
     this.handleMuteUnmute = this.handleMuteUnmute.bind(this);
@@ -97,18 +100,6 @@ export default class Player extends React.Component {
     this.player.current.currentTime = this.player.current.duration * progress;
     this.progressBar.current.style.width = `${e.offsetX}px`;
   }
-  handlePlayPause() {
-    if (this.player.current.error) {
-      console.log(this.player.current.error.message);
-    }
-    if (this.player.current.paused) {
-      this.player.current.play();
-      this.setState({ playing: true });
-    } else {
-      this.player.current.pause();
-      this.setState({ playing: false });
-    }
-  }
   handleSkipBackward() {
     this.player.current.currentTime -= 10;
   }
@@ -165,6 +156,21 @@ export default class Player extends React.Component {
 
     this.togglePlaybackRateControls();
   }
+
+  handlePlayingChange(playing) {
+    this.setState(
+      { playing },
+      () =>
+        this.state.playing
+          ? this.player.current.play()
+          : this.player.current.pause()
+    );
+  }
+
+  handleCurrentTimeChange(time) {
+    this.player.current.currentTime += time;
+  }
+
   togglePlaybackRateControls() {
     if (
       this.playbackRateControls.current.style.maxHeight &&
@@ -192,22 +198,14 @@ export default class Player extends React.Component {
           <div ref={this.progressBar} className="player__progress-bar" />
         </div>
         <audio ref={this.player} autoPlay src={this.props.link} />
+
         <div className="player__controls-container">
-          <div>
-            <button className="btn" onClick={this.handleSkipBackward}>
-              -10
-            </button>
-            <button className="btn" onClick={this.handlePlayPause}>
-              {this.state.playing ? (
-                <i className="fas fa-pause" />
-              ) : (
-                <i className="fas fa-play" />
-              )}
-            </button>
-            <button className="btn" onClick={this.handleSkipForward}>
-              +10
-            </button>
-          </div>
+          <MainControls
+            playing={this.state.playing}
+            onPlayingChange={this.handlePlayingChange}
+            onCurrentTimeChange={this.handleCurrentTimeChange}
+          />
+
           <TimeDisplay
             currentTime={this.state.currentTime}
             duration={this.state.duration}
