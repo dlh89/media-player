@@ -2,6 +2,8 @@ import React from "react";
 import moment from "moment";
 import ArrayFrom from "array.from";
 
+import TimeDisplay from "./TimeDisplay";
+
 export default class Player extends React.Component {
   constructor(props) {
     super(props);
@@ -206,11 +208,10 @@ export default class Player extends React.Component {
               +10
             </button>
           </div>
-          <div className="btn" className="player__time">
-            <p>
-              {this.state.currentTime} / {this.state.duration}
-            </p>
-          </div>
+          <TimeDisplay
+            currentTime={this.state.currentTime}
+            duration={this.state.duration}
+          />
           <div className="player__playback-rate">
             <button
               className="player__playback-rate-btn player__playback-rate-btn--primary"
