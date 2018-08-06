@@ -1,9 +1,10 @@
 import React from "react";
 import moment from "moment";
-import ArrayFrom from "array.from";
 
 import MainControls from "./MainControls";
 import TimeDisplay from "./TimeDisplay";
+import PlaybackRateControls from "./PlaybackRateControls";
+import VolumeControls from "./VolumeControls";
 
 export default class Player extends React.Component {
   constructor(props) {
@@ -13,7 +14,6 @@ export default class Player extends React.Component {
     this.player = React.createRef();
     this.progressContainer = React.createRef();
     this.progressBar = React.createRef();
-    this.playbackRateControls = React.createRef();
 
     this.state = {
       volume: 100,
@@ -27,18 +27,13 @@ export default class Player extends React.Component {
 
     this.handlePlayingChange = this.handlePlayingChange.bind(this);
     this.handleCurrentTimeChange = this.handleCurrentTimeChange.bind(this);
-
-    this.handleSkipBackward = this.handleSkipBackward.bind(this);
-    this.handleSkipForward = this.handleSkipForward.bind(this);
-    this.handleMuteUnmute = this.handleMuteUnmute.bind(this);
-    this.handleVolumeChange = this.handleVolumeChange.bind(this);
     this.handlePlaybackRateChange = this.handlePlaybackRateChange.bind(this);
+    this.handleVolumeChange = this.handleVolumeChange.bind(this);
+    this.handleMutedChange = this.handleMutedChange.bind(this);
+
     this.handleProgressChange = this.handleProgressChange.bind(this);
     this.handleProgress = this.handleProgress.bind(this);
     this.canPlay = this.canPlay.bind(this);
-    this.togglePlaybackRateControls = this.togglePlaybackRateControls.bind(
-      this
-    );
   }
   componentDidMount() {
     let mousedown = false;
@@ -100,31 +95,11 @@ export default class Player extends React.Component {
     this.player.current.currentTime = this.player.current.duration * progress;
     this.progressBar.current.style.width = `${e.offsetX}px`;
   }
-  handleSkipBackward() {
-    this.player.current.currentTime -= 10;
-  }
-  handleSkipForward() {
-    this.player.current.currentTime += 10;
-  }
-  handleMuteUnmute() {
-    if (this.player.current.muted) {
-      this.player.current.muted = false;
-      this.setState(
-        { muted: false, volume: this.state.prevVolume },
-        () => (this.player.current.volume = this.state.volume / 100)
-      );
-    } else {
-      this.player.current.volume = 0;
-      this.player.current.muted = true;
-      this.setState(prevState => {
-        return { muted: true, volume: 0, prevVolume: prevState.volume };
-      });
-    }
-  }
-  handleVolumeChange(e) {
+
+  handleVolumeChange(volume) {
     this.setState(
       {
-        volume: e.target.value
+        volume
       },
       () => {
         if (this.state.volume === "0") {
@@ -136,25 +111,27 @@ export default class Player extends React.Component {
         }
       }
     );
-
-    this.player.current.volume = e.target.value / 100;
+    this.player.current.volume = volume / 100;
   }
-  handlePlaybackRateChange(e) {
-    this.setState({
-      playbackRate: e.target.value
-    });
-    this.player.current.playbackRate = e.target.value;
 
-    // remove the active class from any other buttons and add to the one clicked
-    const activeButtons = ArrayFrom(
-      document.querySelectorAll(".player__playback-rate-btn--active")
-    );
-    activeButtons.forEach(button => {
-      button.classList.remove("player__playback-rate-btn--active");
-    });
-    e.target.classList.add("player__playback-rate-btn--active");
+  handleMutedChange(muted) {
+    if (muted) {
+      this.setState(prevState => {
+        return { muted: true, volume: 0, prevVolume: prevState.volume };
+      });
+    } else {
+      this.setState(
+        { muted: false, volume: this.state.prevVolume },
+        () => (this.player.current.volume = this.state.volume / 100)
+      );
+    }
 
-    this.togglePlaybackRateControls();
+    this.player.current.muted = muted;
+  }
+
+  handlePlaybackRateChange(playbackRate) {
+    this.setState({ playbackRate });
+    this.player.current.playbackRate = playbackRate;
   }
 
   handlePlayingChange(playing) {
@@ -169,24 +146,6 @@ export default class Player extends React.Component {
 
   handleCurrentTimeChange(time) {
     this.player.current.currentTime += time;
-  }
-
-  togglePlaybackRateControls() {
-    if (
-      this.playbackRateControls.current.style.maxHeight &&
-      this.playbackRateControls.current.style.maxHeight !== "0px"
-    ) {
-      this.playbackRateControls.current.style.maxHeight = 0;
-    } else {
-      const buttonCount = document.querySelectorAll(
-        ".player__playback-rate-btn"
-      ).length;
-      this.playbackRateControls.current.style.maxHeight = `${document.querySelector(
-        ".player__playback-rate-btn"
-      ).scrollHeight *
-        buttonCount -
-        1}px`;
-    }
   }
   render() {
     return (
@@ -210,85 +169,19 @@ export default class Player extends React.Component {
             currentTime={this.state.currentTime}
             duration={this.state.duration}
           />
-          <div className="player__playback-rate">
-            <button
-              className="player__playback-rate-btn player__playback-rate-btn--primary"
-              onClick={this.togglePlaybackRateControls}
-            >
-              {this.state.playbackRate}x
-            </button>
-            <div
-              ref={this.playbackRateControls}
-              className="player__playback-rate-controls"
-            >
-              <button
-                className="player__playback-rate-btn"
-                value="0.25"
-                onClick={this.handlePlaybackRateChange}
-              >
-                0.25x
-              </button>
-              <button
-                className="player__playback-rate-btn"
-                value="0.5"
-                onClick={this.handlePlaybackRateChange}
-              >
-                0.5x
-              </button>
-              <button
-                className="player__playback-rate-btn"
-                value="0.75"
-                onClick={this.handlePlaybackRateChange}
-              >
-                0.75x
-              </button>
-              <button
-                className="player__playback-rate-btn player__playback-rate-btn--active"
-                value="1"
-                onClick={this.handlePlaybackRateChange}
-              >
-                1x
-              </button>
-              <button
-                className="player__playback-rate-btn"
-                value="1.25"
-                onClick={this.handlePlaybackRateChange}
-              >
-                1.25x
-              </button>
-              <button
-                className="player__playback-rate-btn"
-                value="1.5"
-                onClick={this.handlePlaybackRateChange}
-              >
-                1.5x
-              </button>
-              <button
-                className="player__playback-rate-btn"
-                value="2"
-                onClick={this.handlePlaybackRateChange}
-              >
-                2x
-              </button>
-            </div>
-          </div>
-          <div className="player__volume-controls">
-            <button className="btn" onClick={this.handleMuteUnmute}>
-              {this.state.muted ? (
-                <i className="fas fa-volume-off" />
-              ) : (
-                <i className="fas fa-volume-up" />
-              )}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={this.state.volume}
-              onChange={this.handleVolumeChange}
-              className="player__volume-slider"
-            />
-          </div>
+
+          <PlaybackRateControls
+            playbackRate={this.state.playbackRate}
+            onPlaybackRateChange={this.handlePlaybackRateChange}
+          />
+
+          <VolumeControls
+            volume={this.state.volume}
+            muted={this.state.muted}
+            onVolumeChange={this.handleVolumeChange}
+            onMutedChange={this.handleMutedChange}
+          />
+
           <a href={this.props.link} download target="_blank">
             <i className="fas fa-download" />
           </a>
