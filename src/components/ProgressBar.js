@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 
 export default class ProgressBar extends React.Component {
   constructor(props) {
@@ -9,6 +10,24 @@ export default class ProgressBar extends React.Component {
     this.progressBar = React.createRef();
 
     this.handleProgressChange = this.handleProgressChange.bind(this);
+    this.updateProgressBar = this.updateProgressBar.bind(this);
+  }
+
+  componentWillReceiveProps() {
+    // update the progress bar based on props
+    this.updateProgressBar();
+  }
+
+  updateProgressBar() {
+    // convert currentTime and duration from H:mm:ss to seconds
+    const currentTimeSeconds = moment
+      .duration(this.props.currentTime)
+      .asSeconds();
+    const durationSeconds = moment.duration(this.props.duration).asSeconds();
+    // multiply progressContainer width by decimal of progress
+    this.progressBar.current.style.width = `${this.progressContainer.current
+      .offsetWidth *
+      (currentTimeSeconds / durationSeconds)}px`;
   }
 
   handleProgressChange(e) {
