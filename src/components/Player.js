@@ -34,6 +34,7 @@ export default class Player extends React.Component {
     this.handleProgressChange = this.handleProgressChange.bind(this);
     this.handleProgress = this.handleProgress.bind(this);
     this.canPlay = this.canPlay.bind(this);
+    this.linkError = this.linkError.bind(this);
   }
 
   componentDidMount() {
@@ -46,7 +47,9 @@ export default class Player extends React.Component {
   }
 
   linkError() {
-    alert("There was an error loading the URL you provided.");
+    this.props.onErrorChange(
+      "There was an error loading the URL provided. Please check the URL and try again."
+    );
   }
 
   canPlay() {
@@ -59,6 +62,8 @@ export default class Player extends React.Component {
         canPlay: true
       });
     }
+    // call the callback function to clear error in parent state
+    this.props.onErrorChange("");
   }
 
   handleProgress() {
