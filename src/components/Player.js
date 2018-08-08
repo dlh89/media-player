@@ -36,12 +36,40 @@ export default class Player extends React.Component {
     this.canPlay = this.canPlay.bind(this);
     this.linkError = this.linkError.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.restorePlayerState = this.restorePlayerState.bind(this);
   }
 
   componentDidMount() {
+    // Get initial state from localStorage if it exists
+    if (localStorage.state !== "undefined") {
+      const localState = JSON.parse(localStorage.state);
+      this.setState({ ...localState }, this.restorePlayerState);
+      // TODO: Restore the state settings to the HTML audio element
+    }
+
     this.player.current.addEventListener("timeupdate", this.handleProgress);
     this.player.current.addEventListener("canplay", this.canPlay);
     this.player.current.addEventListener("error", this.linkError);
+  }
+
+  componentWillUnmount() {
+    this.player.current.removeEventListener("timeupdate", this.handleProgress);
+    this.player.current.removeEventListener("canplay", this.canPlay);
+    this.player.current.removeEventListener("error", this.linkError);
+    this.saveToLocalStorage();
+  }
+
+  restorePlayerState() {
+    this.player.current.currentTime = moment
+      .duration(this.state.currentTime)
+      .asSeconds();
+    this.player.current.volume = this.state.volume / 100;
+    this.player.current.muted = this.state.muted;
+    this.player.current.playbackRate = this.state.playbackRate;
+  }
+
+  saveToLocalStorage() {
+    localStorage.setItem("state", JSON.stringify(this.state));
   }
 
   linkError() {
@@ -51,7 +79,6 @@ export default class Player extends React.Component {
   }
 
   canPlay() {
-    console.log("canplay");
     if (this.player.current.duration) {
       this.setState({
         duration: moment()
