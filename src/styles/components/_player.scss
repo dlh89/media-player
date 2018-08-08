@@ -89,4 +89,11 @@
       @include thumb;
     }
   }
+
+  &__close {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
 }

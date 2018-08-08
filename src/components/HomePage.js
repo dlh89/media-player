@@ -9,15 +9,20 @@ export default class HomePage extends React.Component {
     super();
     this.state = {
       link: "",
-      error: ""
+      error: "",
+      playerOpen: false
     };
     this.handleErrorChange = this.handleErrorChange.bind(this);
+    this.handleClose = this.handleClose.bind(this);
   }
   passLinkProp(params) {
-    this.setState({ link: params });
+    this.setState({ link: params, playerOpen: true });
   }
   handleErrorChange(error) {
     this.setState({ error });
+  }
+  handleClose() {
+    this.setState({ playerOpen: false });
   }
   render() {
     return (
@@ -27,12 +32,13 @@ export default class HomePage extends React.Component {
           <LinkInput callback={this.passLinkProp.bind(this)} />
           <Notification error={this.state.error} />
         </div>
-        <div>
+        {this.state.playerOpen && (
           <Player
             link={this.state.link}
             onErrorChange={this.handleErrorChange}
+            onClose={this.handleClose}
           />
-        </div>
+        )}
       </div>
     );
   }

@@ -35,13 +35,11 @@ export default class Player extends React.Component {
     this.handleProgress = this.handleProgress.bind(this);
     this.canPlay = this.canPlay.bind(this);
     this.linkError = this.linkError.bind(this);
+    this.handleClose = this.handleClose.bind(this);
   }
 
   componentDidMount() {
     this.player.current.addEventListener("timeupdate", this.handleProgress);
-  }
-
-  componentWillReceiveProps() {
     this.player.current.addEventListener("canplay", this.canPlay);
     this.player.current.addEventListener("error", this.linkError);
   }
@@ -53,6 +51,7 @@ export default class Player extends React.Component {
   }
 
   canPlay() {
+    console.log("canplay");
     if (this.player.current.duration) {
       this.setState({
         duration: moment()
@@ -134,6 +133,10 @@ export default class Player extends React.Component {
     this.player.current.currentTime += time;
   }
 
+  handleClose() {
+    this.props.onClose();
+  }
+
   render() {
     return (
       <div className="player">
@@ -173,6 +176,9 @@ export default class Player extends React.Component {
           <a href={this.props.link} download target="_blank">
             <i className="fas fa-download" />
           </a>
+          <button className="player__close" onClick={this.handleClose}>
+            <i className="fas fa-times" />
+          </button>
         </div>
       </div>
     );
