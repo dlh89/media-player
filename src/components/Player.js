@@ -22,7 +22,8 @@ export default class Player extends React.Component {
       duration: "",
       playing: false,
       muted: false,
-      canPlay: false
+      canPlay: false,
+      link: this.props.link
     };
 
     this.handlePlayingChange = this.handlePlayingChange.bind(this);
@@ -40,11 +41,10 @@ export default class Player extends React.Component {
   }
 
   componentDidMount() {
+    const localState = JSON.parse(localStorage.playerState);
     // Get initial state from localStorage if it exists
-    if (localStorage.state !== "undefined") {
-      const localState = JSON.parse(localStorage.state);
+    if (localState !== "undefined" && localState.link === this.props.link) {
       this.setState({ ...localState }, this.restorePlayerState);
-      // TODO: Restore the state settings to the HTML audio element
     }
 
     this.player.current.addEventListener("timeupdate", this.handleProgress);
@@ -69,7 +69,7 @@ export default class Player extends React.Component {
   }
 
   saveToLocalStorage() {
-    localStorage.setItem("state", JSON.stringify(this.state));
+    localStorage.setItem("playerState", JSON.stringify(this.state));
   }
 
   linkError() {
@@ -80,27 +80,33 @@ export default class Player extends React.Component {
 
   canPlay() {
     if (this.player.current.duration) {
-      this.setState({
-        duration: moment()
-          .startOf("day")
-          .seconds(this.player.current.duration)
-          .format("H:mm:ss"),
-        canPlay: true
-      });
+      this.setState(
+        {
+          duration: moment()
+            .startOf("day")
+            .seconds(this.player.current.duration)
+            .format("H:mm:ss"),
+          canPlay: true
+        },
+        this.saveToLocalStorage
+      );
     }
     // call the callback function to clear error in parent state
     this.props.onErrorChange("");
   }
 
   handleProgress() {
-    this.setState({
-      currentTime: moment()
-        .startOf("day")
-        .seconds(this.player.current.currentTime)
-        .format("H:mm:ss")
-    });
+    this.setState(
+      {
+        currentTime: moment()
+          .startOf("day")
+          .seconds(this.player.current.currentTime)
+          .format("H:mm:ss")
+      },
+      this.saveToLocalStorage
+    );
     if (!this.player.current.paused && !this.state.playing) {
-      this.setState({ playing: true });
+      this.setState({ playing: true }, this.saveToLocalStorage);
     }
   }
 
@@ -121,6 +127,7 @@ export default class Player extends React.Component {
           this.setState({ muted: false });
           this.player.current.muted = false;
         }
+        this.saveToLocalStorage();
       }
     );
     this.player.current.volume = volume / 100;
@@ -130,30 +137,29 @@ export default class Player extends React.Component {
     if (muted) {
       this.setState(prevState => {
         return { muted: true, volume: 0, prevVolume: prevState.volume };
-      });
+      }, this.saveToLocalStorage);
     } else {
-      this.setState(
-        { muted: false, volume: this.state.prevVolume },
-        () => (this.player.current.volume = this.state.volume / 100)
-      );
+      this.setState({ muted: false, volume: this.state.prevVolume }, () => {
+        this.player.current.volume = this.state.volume / 100;
+        this.saveToLocalStorage();
+      });
     }
 
     this.player.current.muted = muted;
   }
 
   handlePlaybackRateChange(playbackRate) {
-    this.setState({ playbackRate });
+    this.setState({ playbackRate }, this.saveToLocalStorage);
     this.player.current.playbackRate = playbackRate;
   }
 
   handlePlayingChange(playing) {
-    this.setState(
-      { playing },
-      () =>
-        this.state.playing
-          ? this.player.current.play()
-          : this.player.current.pause()
-    );
+    this.setState({ playing }, () => {
+      this.state.playing
+        ? this.player.current.play()
+        : this.player.current.pause();
+      this.saveToLocalStorage();
+    });
   }
 
   handleCurrentTimeChange(time) {

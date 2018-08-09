@@ -14,15 +14,29 @@ export default class HomePage extends React.Component {
     };
     this.handleErrorChange = this.handleErrorChange.bind(this);
     this.handleClose = this.handleClose.bind(this);
+    this.saveToLocalStorage = this.saveToLocalStorage.bind(this);
+  }
+  componentDidMount() {
+    const localState = JSON.parse(localStorage.homePageState);
+    // Get initial state from localStorage if it exists
+    if (localState !== "undefined") {
+      this.setState({ ...localState });
+    }
+  }
+  componentWillUnmount() {
+    this.saveToLocalStorage();
+  }
+  saveToLocalStorage() {
+    localStorage.setItem("homePageState", JSON.stringify(this.state));
   }
   passLinkProp(params) {
-    this.setState({ link: params, playerOpen: true });
+    this.setState({ link: params, playerOpen: true }, this.saveToLocalStorage);
   }
   handleErrorChange(error) {
-    this.setState({ error });
+    this.setState({ error }, this.saveToLocalStorage);
   }
   handleClose() {
-    this.setState({ playerOpen: false });
+    this.setState({ playerOpen: false }, this.saveToLocalStorage);
   }
   render() {
     return (
