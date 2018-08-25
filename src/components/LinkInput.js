@@ -26,7 +26,7 @@ export default class LinkInput extends React.Component {
   render() {
     return (
       <div>
-        <form>
+        <form className="link">
           <input
             className="link__input"
             type="url"

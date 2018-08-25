@@ -17,8 +17,13 @@ export default class HomePage extends React.Component {
     this.saveToLocalStorage = this.saveToLocalStorage.bind(this);
   }
   componentDidMount() {
-    const localState = JSON.parse(localStorage.homePageState);
+    let localState = "";
+
+    if (localStorage.homePageState) {
+      localState = JSON.parse(localStorage.homePageState);
+    }
     // Get initial state from localStorage if it exists
+    console.log(localState);
     if (localState !== "undefined") {
       this.setState({ ...localState });
     }
